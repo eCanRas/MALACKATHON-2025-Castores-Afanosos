@@ -2,6 +2,8 @@
 title: "Análisis Exploratorio de SaludMental"
 author: "Castores Afanosos"
 output:
+  pdf_document:
+    latex_engine: xelatex  # ¡La clave está aquí!
   html_document:
     theme: cerulean
     highlight: tango
@@ -10,8 +12,6 @@ output:
     toc_float:
       collapsed: true
       smooth_scroll: true
-  pdf_document:
-    latex_engine: xelatex  # ¡La clave está aquí!
 ---
 
 ```{r setup, include=FALSE}
@@ -33,7 +33,6 @@ head(SaludMental)
 ```
 
 # Análisis descriptivo
-
 
 ## Estructura y Tipos de Datos
 
@@ -103,8 +102,6 @@ SaludMental |>
   theme_minimal()
 ```
 
-
-
 Por otro lado, en variables como *Estancia Dias,* el valor máximo (814) está muy por encima de la media (15,46), lo que confirma la presencia de outliers extremos los cuales, elevan el valor de la media con relación a la mediana (11), dando lugar a una distribución sesgada.
 
 ```{r warning=FALSE}
@@ -150,7 +147,6 @@ SaludMental |>
   theme_minimal()
 ```
 
-
 De la misma forma, la variable *Peso Español APR* tiene un sutil sesgo negativo, ya que al igual que la variable anterior, contiene potenciales outliers.
 
 ```{r warning=FALSE}
@@ -176,7 +172,7 @@ SaludMental |>
   labs(
     title = "Distribución del Peso Español APR",
     subtitle = paste0("Media: ", round(media_pesoEsp, 2), " | Mediana: ", round(mediana_pesoEsp, 2)),
-    x = "Estancia Días",
+    x = "Peso Español APR",
     y = "Densidad"
   ) +
   theme_minimal()
@@ -222,6 +218,7 @@ SaludMental <- SaludMental |>
 ```
 
 Una vez re-etiquetadas, se convierte a factor las que quedan.
+
 ```{r}
 # 1. Definir una lista de las variables categóricas (¡Añade todas las que sean relevantes!)
 variables_categoricas <- c("Comunidad Autónoma", "Categoría", "Servicio", "Nivel Severidad APR", "Riesgo Mortalidad APR", "Tipo GRD APR", "Mes de Ingreso")
@@ -278,8 +275,7 @@ En este estudio veremos el porcentaje de valores NA del dataset.
 skim(SaludMental)
 ```
 
-Como se puede observar en el resumen acerca de los valores nulos, hay muchas columnas con columnas vacías. 
-Para verlo con más facilidad, se hará el porcentake de valores nulos para cada columna.
+Como se puede observar en el resumen acerca de los valores nulos, hay muchas columnas con columnas vacías. Para verlo con más facilidad, se hará el porcentake de valores nulos para cada columna.
 
 ```{r}
 
@@ -339,6 +335,7 @@ SaludMental |>
 ```
 
 De la misma forma, se hará un diagrama que refleje outliers en una variable categórica.
+
 ```{r}
 SaludMental |>
   # Usamos la variable Tipo Alta ya etiquetada como factor
@@ -357,13 +354,14 @@ SaludMental |>
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-
 # Ingeniería de características
 
 ## Variables Temporales y Demográficas
+
 En este apartado vamos a agrupar las muestras de variables tanto demográficas como temporales.
 
 Empezaremos segmentando la variable *Edad* en 3 grupos: Menores de Edad, Adultos hasta 45, Adultos hasta 65 y Mayores
+
 ```{r}
 SaludMental <-  SaludMental |> 
   mutate(Edad_Rango = case_when( SaludMental$Edad < 18 ~ "Menor (0-17)", SaludMental$Edad >= 18 & SaludMental$Edad < 45 ~ "Adulto (18-44)", SaludMental$Edad >= 45 & SaludMental$Edad < 65 ~ "Adulto (45-64)", TRUE ~ "Mayor (65+)" ))
@@ -373,8 +371,8 @@ SaludMental |>
   select(Nombre, Edad, Edad_Rango)
 ```
 
+Por otro lado, también puede ser interesante añadir el día de la semana con el propósito de evaluar si los los ingresos varían según el día.
 
-Por otro lado, también puede ser interesante añadir el día de la semana con el propósito de evaluar si los  los ingresos varían según el día.
 ```{r}
 SaludMental <- SaludMental |> 
   mutate(
@@ -387,9 +385,9 @@ SaludMental |>
   select(Nombre, `Fecha de Ingreso`, Dia_Semana_Ingreso)
 ```
 
-
 ## Variables Clínicas y de Calidad
-Estas variables se centran en la complejidad clínica y la calidad asistencial, utilizando la información de diagnósticos y procedimientos. En este caso, contaremos a cuántos procedimientos se ha sometido cada paciente, así como el número de diagnósticos. 
+
+Estas variables se centran en la complejidad clínica y la calidad asistencial, utilizando la información de diagnósticos y procedimientos. En este caso, contaremos a cuántos procedimientos se ha sometido cada paciente, así como el número de diagnósticos.
 
 ```{r}
 SaludMental <- SaludMental |>
@@ -410,3 +408,34 @@ SaludMental <- SaludMental |>
 SaludMental |> 
   select(Nombre, Num_Diagnosticos, Num_Procedimientos)
 ```
+
+# Conclusión
+El análisis exploratorio realizado sobre el conjunto de datos de salud mental revela aspectos cruciales tanto en la calidad de los datos como en las características demográficas y asistenciales de los pacientes.
+
+
+### Calidad y Estructura de los Datos
+
+**Problemas de Integridad**: Se identificó una cantidad elevada de valores nulos (NA) en numerosas variables, especialmente en aquellas procedimentales y de diagnóstico secundario, lo que representa un desafío de calidad de datos. Específicamente, variables clave como *Régimen Financiación* o *CCAA Residencia* muestran una tasa de completitud del 0%.
+
+
+**Preparación de Variables**: Las principales variables categóricas (*Sexo*, *Tipo Alta*, *Circunstancia de Contacto* y otras) fueron correctamente transformadas y re-etiquetadas a factores, según el documento proporcionado.
+
+### Resultados Estadísticos Clave
+
+**Distribución de la Edad**: La variable *Edad* presenta una distribución cercana a la normal (o ligeramente sesgada), lo que se corrobora con la proximidad entre la media (43.64 años) y la mediana (44.00 años).
+
+
+
+**Sesgo en la Estancia**: La variable *Estancia Días* muestra una asimetría positiva significativa, confirmando la presencia de valores atípicos (outliers) extremos. La disparidad entre la media y la mediana, debido a que unos pocos casos de estancias muy largas elevan el promedio, indican que la mediana es una medida más robusta de la duración típica de la estancia.
+
+
+### Características Asistenciales Dominantes
+
+**Vía de Contacto**: La mayoría de los contactos asistenciales se realizaron por la vía *Urgente* , en contraposición a los contactos *Programados*.
+
+
+**Especialidad y Riesgo**: El servicio con mayor frecuencia de ingresos es *Psiquiatría* (PSQ). La mayoría de los pacientes tienen un *Riesgo de Mortalidad APR* catalogado como Nivel 1, lo que sugiere que, en general, la población de estudio presenta un bajo riesgo de mortalidad.
+
+
+
+En resumen, el dataset está listo para la fase de modelado en cuanto a la distribución de la edad, pero requiere una estrategia rigurosa de imputación o limpieza de datos nulos y una consideración especial de los outliers en variables para garantizar la validez de cualquier análisis inferencial posterior.

@@ -1,0 +1,2 @@
+"0","SaludMental <- read_excel(""SaludMental.xls"")"
+"0","head(SaludMental)"

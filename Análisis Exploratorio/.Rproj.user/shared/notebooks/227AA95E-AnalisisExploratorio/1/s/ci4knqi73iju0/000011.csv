@@ -1,0 +1,17 @@
+"0","SaludMental <- SaludMental |>
+  mutate(
+    across(
+      .cols = all_of(variables_categoricas),
+      .fns = as.factor
+    )
+  )
+"
+"1","[1m[33mError[39m in `mutate()`:[22m
+[38;5;232m[36mℹ[38;5;232m In argument: `across(.cols = all_of(variables_categoricas), .fns = as.factor)`.[39m
+[1mCaused by error in `across()`:[22m
+[38;5;232m[36mℹ[38;5;232m In argument: `all_of(variables_categoricas)`.[39m
+[1mCaused by error in `all_of()`:[22m
+[33m![39m Can't subset elements that don't exist.
+[31m✖[39m Element `Mes de Ingreso` doesn't exist.
+[90mRun `]8;;x-r-run:rlang::last_trace()rlang::last_trace()]8;;` to see where the error occurred.[39m
+"

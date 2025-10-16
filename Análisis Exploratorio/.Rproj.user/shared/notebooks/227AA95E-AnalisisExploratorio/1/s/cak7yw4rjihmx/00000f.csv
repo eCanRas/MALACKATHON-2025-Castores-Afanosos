@@ -1,4 +1,1 @@
-"0","SaludMental$Sexo[is.na(SaludMental$Sexo)]
-"
-"1","character(0)
-"
+"0","SaludMental$Sexo[is.na(SaludMental$Sexo)]  <- ""No especificado"""

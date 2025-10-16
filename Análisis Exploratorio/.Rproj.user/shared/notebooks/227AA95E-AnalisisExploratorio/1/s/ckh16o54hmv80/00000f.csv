@@ -1,0 +1,7 @@
+"0","SaludMental |> "
+"0","   ggplot(aes(x = """", fill = factor(`Circunstancia de Contacto`))) + "
+"0","  geom_bar(stat = ""count"", width = 1) + "
+"0","  coord_polar(theta = ""y"") + "
+"0","  labs(title = "" Distribución Circunstancia de Contacto"", x = NULL, y = NULL) +"
+"0","  theme_void() +"
+"0","  scale_fill_manual(values = c(""#E45756"",""#4CAF50"")) "

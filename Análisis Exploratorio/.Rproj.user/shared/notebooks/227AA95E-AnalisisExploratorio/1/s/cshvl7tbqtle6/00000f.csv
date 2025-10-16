@@ -1,0 +1,8 @@
+"0",""
+"0","SaludMental |> "
+"0","   ggplot(aes(x = """", fill = factor(Sexo))) + "
+"0","  geom_bar(stat = ""count"", width = 1) + "
+"0","  coord_polar(theta = ""y"") + "
+"0","  labs(title = ""Distribución de Sexo"", x = NULL, y = NULL) +"
+"0","  theme_void() +"
+"0","  scale_fill_manual(values = c(""#1F77B4"", ""#FFC0CB"", ""#98FF98"")) "

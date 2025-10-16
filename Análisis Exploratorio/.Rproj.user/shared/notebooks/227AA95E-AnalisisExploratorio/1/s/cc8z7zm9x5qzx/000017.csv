@@ -1,6 +1,0 @@
-"0","SaludMental <-  SaludMental |> 
-  SaludMental[!is.na(SaludMental$`CIP SNS Recodificado`),]  
-"
-"2","Error en SaludMental[!is.na(SaludMental$`CIP SNS Recodificado`), ]: 
-  function '[' not supported in RHS call of a pipe (<input>:2:3)
-"

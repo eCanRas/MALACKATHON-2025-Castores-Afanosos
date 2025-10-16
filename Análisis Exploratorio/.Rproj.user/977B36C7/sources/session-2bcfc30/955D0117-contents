@@ -1,0 +1,22 @@
+---
+title: ''
+author: "Marta"
+date: "2025-10-16"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+skim(SaludMental)
+
+
+diagnose(SaludMental)
+
+
+summary(SaludMental)
+```
+

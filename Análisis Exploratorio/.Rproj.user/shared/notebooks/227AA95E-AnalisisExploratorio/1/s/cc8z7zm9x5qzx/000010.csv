@@ -1,0 +1,1 @@
+"0","SaludMental <- SaludMental[!is.na(SaludMental$`CIP SNS Recodificado`),]  "

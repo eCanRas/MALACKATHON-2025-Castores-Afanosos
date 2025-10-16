@@ -3,7 +3,7 @@
     "path": "C:/Users/marta/Desktop/UNI/4º ING. INF/MALACKATHON/MALACKATHON-2025-Castores-Afanosos/Análisis Exploratorio/AnalisisExploratorio.Rmd",
     "project_path": "AnalisisExploratorio.Rmd",
     "type": "r_markdown",
-    "hash": "0",
+    "hash": "3630219189",
     "contents": "",
     "dirty": false,
     "created": 1760543837547.0,
@@ -12,21 +12,21 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "440,235",
-        "scrollLine": "429",
-        "last_setup_crc32": "77cbd4a21f746334",
+        "cursorPosition": "521,18",
+        "scrollLine": "514",
+        "last_setup_crc32": "77cbd4a2e9234752",
         "rmdVisualMode": "false",
         "rmdVisualCollapsedChunks": "",
         "rmdVisualModeLocation": "14224:229.3333282470703",
         "rmdVisualWrapConfigured": "true",
-        "docOutlineVisible": "0"
+        "docOutlineVisible": "1"
     },
     "folds": "",
-    "lastKnownWriteTime": 1760617910,
+    "lastKnownWriteTime": 1760633575,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1760617910291,
+    "last_content_update": 1760633575929,
     "read_only": false,
     "read_only_alternatives": []
 }

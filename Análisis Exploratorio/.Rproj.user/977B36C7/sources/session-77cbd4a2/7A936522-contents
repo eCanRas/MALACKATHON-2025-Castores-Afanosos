@@ -22,6 +22,7 @@ library(tidyverse)
 library(readxl)
 library(skimr)
 library(ggplot2)
+library(dlookr)
 
 ```
 
@@ -42,31 +43,34 @@ En primer lugar, la estructura del conjunto de datos es revisada para verificar 
 
 -   **Variables numéricas.** Variables como *Estancia Días* o *Edad* fueron confirmadas como de tipo entero (`int`), double(`dbl`) o numérico (`num`), permitiendo el cálculo de medidas de tendencia central y dispersión.
 
--   **Tipos de Datos Desconocidos.** Se identificaron algunas variables como *CCAA Residencia* o *Reingreso* en las que no hay datos, por lo que no se tiene información de tipo, siendo interesante investrigar si se puede reconstruir o eliminarlas.
+-   **Tipos de Datos Desconocidos.** Se identificaron algunas variables como *CCAA Residencia* o *Reingreso* en las que no hay datos, por lo que no se tiene información de tipo, siendo interesante investigar si se puede reconstruir o eliminarlas.
+
 
 ### Análisis Estadístico Elemental y Outliers
 
 ```{r}
-summary(SaludMental)
+SaludMental |>
+  select(c(1:10)) |>
+  summary()
 
 ```
 
-Observamos que en algunas variables claves como la *Edad,* en la que la media y la mediana son muy cercanas, sugiriendo que sigue una distribución normal o muy ligeramente sesgada.
+Observamos que en algunas variables claves como la *Edad*, en la que la media y la mediana son muy cercanas, sugiriendo que sigue una distribución normal o muy ligeramente sesgada.
 
 ```{r}
 summary(SaludMental$Edad)
 ```
 
 ```{r}
-# 1. Calcular Media y Desviación Estándar (excluyendo NA)
+# Calcular Media, Mediana y Desviación Estándar (excluyendo NA)
 media_edad <- mean(SaludMental$Edad, na.rm = TRUE)
 sd_edad <- sd(SaludMental$Edad, na.rm = TRUE)
 mediana_edad <- median(SaludMental$Edad, na.rm = TRUE)
 
-# 2. Generar el gráfico con la curva de Densidad (naranja) Y la Gaussiana (roja)
+# Generar el gráfico con la curva Gaussiana (verde)
 SaludMental |>
   ggplot(aes(x = Edad)) +
-  # 1. Histograma (Muestra la frecuencia real de los datos)
+  # Histograma (Muestra la frecuencia real de los datos)
   geom_histogram(
     aes(y = after_stat(density)),
     binwidth = 5,
@@ -74,17 +78,15 @@ SaludMental |>
     color = "white",
     alpha = 0.5
   ) +
-  # 2. Curva de Densidad 
-
-  # 3. Curva GAUSSIANA 
+  # Curva GAUSSIANA 
   geom_function(
     fun = dnorm, # La función de densidad normal
     args = list(mean = media_edad, sd = sd_edad),
-    color = "#98FF98", # Color rojo/vino para diferenciar
+    color = "#98FF98",
     linewidth = 1.2
   ) +
 
-  # 4. Marcas de Media y Mediana
+  # Marcas de Media y Mediana
   geom_vline(aes(xintercept = media_edad, color = "Media"),
              linetype = "dashed", linewidth = 1) +
   geom_vline(aes(xintercept = mediana_edad, color = "Mediana"),
@@ -95,7 +97,9 @@ SaludMental |>
                      values = c("Media" = "#4C78A8", "Mediana" = "#E45756")) +
   labs(
     title = "Distribución de la Edad vs. Curva Normal Teórica",
-    subtitle = paste0("Media: ", round(media_edad, 2), " | Mediana: ", round(mediana_edad, 2), " | Desv. Estándar: ", round(sd_edad, 2)),
+    subtitle = paste0("Media: ", round(media_edad, 2),
+                      " | Mediana: ", round(mediana_edad, 2),
+                      " | Desv. Estándar: ", round(sd_edad, 2)),
     x = "Edad (Años)",
     y = "Densidad"
   ) +
@@ -109,14 +113,14 @@ summary(SaludMental$`Estancia Días`)
 ```
 
 ```{r warning=FALSE}
-# 1. Calcular Media, Mediana de Estancia Días (excluyendo NA)
+# Calcular Media, Mediana de Estancia Días (excluyendo NA)
 media_estancia <- mean(SaludMental$`Estancia Días`, na.rm = TRUE)
 mediana_estancia <- median(SaludMental$`Estancia Días`, na.rm = TRUE)
 
-# 2. Generar el gráfico de distribución
+# Generar el gráfico de distribución
 SaludMental |>
   ggplot(aes(x = `Estancia Días`)) +
-  # 1. Histograma (Muestra la frecuencia real de los datos)
+  # Histograma (Muestra la frecuencia real de los datos)
   geom_histogram(
     aes(y = after_stat(density)),
     binwidth = 5, # Agrupa los días en intervalos de 5
@@ -124,23 +128,24 @@ SaludMental |>
     color = "white",
     alpha = 0.5
   ) +
-  # 2. Curva de Densidad 
+  # Curva de Densidad 
   geom_density(linewidth = 1.2, color = "#98FF98", adjust = 2) +
 
-  # 4. Marcas de Media y Mediana
+  # Marcas de Media y Mediana
   geom_vline(aes(xintercept = media_estancia, color = "Media"),
              linetype = "dashed", linewidth = 1) +
   geom_vline(aes(xintercept = mediana_estancia, color = "Mediana"),
              linetype = "solid", linewidth = 1) +
 
-  # Limitamos el eje X para apreciar la asimetría y evitar que el outlier de 814 comprima el gráfico
+  # Limitamos el eje X para evitar que el outlier de 814 comprima el gráfico
   xlim(0, 80) +
 
   scale_color_manual(name = "Estadístico",
                      values = c("Media" = "#4C78A8", "Mediana" = "#E45756")) +
   labs(
     title = "Distribución de la Estancia en Días",
-    subtitle = paste0("Media: ", round(media_estancia, 2), " | Mediana: ", round(mediana_estancia, 2)),
+    subtitle = paste0("Media: ", round(media_estancia, 2),
+                      " | Mediana: ", round(mediana_estancia, 2)),
     x = "Estancia Días",
     y = "Densidad"
   ) +
@@ -150,17 +155,17 @@ SaludMental |>
 De la misma forma, la variable *Peso Español APR* tiene un sutil sesgo negativo, ya que al igual que la variable anterior, contiene potenciales outliers.
 
 ```{r warning=FALSE}
-# 1. Calcular Media, Mediana y Desviación Estándar de Estancia Días (excluyendo NA)
+# Calcular Media, Mediana y Desviación Estándar de Estancia Días (excluyendo NA)
 media_pesoEsp <- mean(SaludMental$`Peso Español APR`, na.rm = TRUE)
 mediana_pesoEsp <- median(SaludMental$`Peso Español APR`, na.rm = TRUE)
 
-# 2. Generar el gráfico de distribución
+#  Generar el gráfico de distribución
 SaludMental |>
   ggplot(aes(x = `Peso Español APR`)) +
-  # 1. Histograma (Muestra la frecuencia real de los datos)
+  #  Histograma (Muestra la frecuencia real de los datos)
   geom_histogram(
     aes(y = after_stat(density)),
-    binwidth = 0.5, # Agrupa los días en intervalos de 5
+    binwidth = 0.5, # Agrupa los días en intervalos de 0.5
     fill = "#4C78A8",
     color = "white",
     alpha = 0.5
@@ -171,7 +176,8 @@ SaludMental |>
                      values = c("Media" = "#4C78A8", "Mediana" = "#E45756")) +
   labs(
     title = "Distribución del Peso Español APR",
-    subtitle = paste0("Media: ", round(media_pesoEsp, 2), " | Mediana: ", round(mediana_pesoEsp, 2)),
+    subtitle = paste0("Media: ", round(media_pesoEsp, 2),
+                      " | Mediana: ", round(mediana_pesoEsp, 2)),
     x = "Peso Español APR",
     y = "Densidad"
   ) +
@@ -192,21 +198,27 @@ SaludMental <- SaludMental |>
       labels = c("Varón", "Mujer", "Indeterminado", "No especificado")
     ),
 
-    # **Tipo Alta:** 1. Domicilio / 2. Traslado Hospital / 3. Alta voluntaria / 4. Éxitus / 5. Traslado Sociosanitario / 9. Otros/Desconocido
+    # **Tipo Alta:** 1. Domicilio / 2. Traslado Hospital / 3. Alta voluntaria 
+    #  4. Éxitus / 5. Traslado Sociosanitario / 9. Otros/Desconocido
     `Tipo Alta` = factor(
       `Tipo Alta`,
       levels = c(1, 2, 3, 4, 5, 9),
-      labels = c("Domicilio", "Traslado Otro Hospital", "Alta Voluntaria", "Éxitus", "Traslado Sociosanitario", "Otros/Desconocido")
+      labels = c("Domicilio", "Traslado Otro Hospital", "Alta Voluntaria",
+                 "Éxitus", "Traslado Sociosanitario", "Otros/Desconocido")
     ),
 
     # **Régimen de financiación:** 1 a 9 según diccionario
     `Régimen Financiación` = factor(
       `Régimen Financiación`,
       levels = c(1, 2, 3, 4, 5, 6, 7, 8, 9),
-      labels = c("Seguridad Social", "Corporaciones Locales/Cabildos", "Mutuas de Asistencia", "Accidentes de Trabajo", "Accidentes de Tráfico", "Privado", "Financiación Mixta", "Otros", "Desconocido")
+      labels = c("Seguridad Social", "Corporaciones Locales/Cabildos", 
+                 "Mutuas de Asistencia", "Accidentes de Trabajo", 
+                 "Accidentes de Tráfico", "Privado", "Financiación Mixta", 
+                 "Otros", "Desconocido")
     ),
     
-    # **Circunstancia de Contacto (Asumiendo que es Tipo de Ingreso):** 1. Urgente / 2. Programado / 9. Otros/Desconocido
+    # **Circunstancia de Contacto (Asumiendo que es Tipo de Ingreso):** 1. Urgente / 
+    #2. Programado / 9. Otros/Desconocido
     `Circunstancia de Contacto` = factor(
       `Circunstancia de Contacto`,
       levels = c(1, 2, 9), # Asumiendo que 9 es el código de Otros/Desconocido si existe.
@@ -217,11 +229,14 @@ SaludMental <- SaludMental |>
 
 ```
 
+
 Una vez re-etiquetadas, se convierte a factor las que quedan.
 
 ```{r}
-# 1. Definir una lista de las variables categóricas (¡Añade todas las que sean relevantes!)
-variables_categoricas <- c("Comunidad Autónoma", "Categoría", "Servicio", "Nivel Severidad APR", "Riesgo Mortalidad APR", "Tipo GRD APR", "Mes de Ingreso")
+ # Definir una lista de las variables categóricas 
+variables_categoricas <- c("Comunidad Autónoma", "Categoría", "Servicio",
+                           "Nivel Severidad APR", "Riesgo Mortalidad APR",
+                           "Tipo GRD APR", "Mes de Ingreso")
 
 SaludMental <- SaludMental |>
   mutate(
@@ -230,7 +245,7 @@ SaludMental <- SaludMental |>
       .fns = as.factor
     )
   )
-# 2. Aplicar la conversión a factor usando mutate(across())
+# Aplicar la conversión a factor usando mutate(across())
 SaludMental <- SaludMental |>
   mutate(
     # 'across' permite aplicar una función a múltiples columnas
@@ -271,29 +286,89 @@ SaludMental |>
 
 En este estudio veremos el porcentaje de valores NA del dataset.
 
+Se visualizarán las variables de tipo numérico y factor (categórico)
+
 ```{r}
-skim(SaludMental)
+SaludMental |>
+  select(
+    where(is.numeric), # Selecciona todas las columnas de tipo numérico/entero
+    where(is.factor)   # Selecciona todas las columnas de tipo factor
+  ) |>
+  skim()
 ```
 
-Como se puede observar en el resumen acerca de los valores nulos, hay muchas columnas con columnas vacías. Para verlo con más facilidad, se hará el porcentake de valores nulos para cada columna.
+Como se puede observar en el resumen acerca de los valores nulos, hay muchas columnas con campos vacíos. Para verlo con más facilidad, se hará el porcentaje de valores nulos para cada columna. 
 
 ```{r}
 
 # Porcentaje de NA en cada columna 
-porcentaje_na_columnas <- sapply(SaludMental, function(x) sum(is.na(x)) / length(x) * 100)
-porcentaje_na_columnas
+porcentaje_na_columnas <- sapply(SaludMental, function(x) round(sum(is.na(x)) / length(x) * 100, 2))
+head(porcentaje_na_columnas,20)
 
 ```
 
-De esta manera podemos observar que hay varias columnas con un alto porcentaje de valores nulos, como pueden ser muchos de los diagnósticos, además de varias columnas con todos los valores nulos, como *CCAA Residencia* o un gran número de los procedimientos.
+De esta manera también se puede observar que hay varias columnas con un alto porcentaje de valores nulos, como pueden ser muchos de los diagnósticos, además de varias columnas con todos los valores nulos, como *CCAA Residencia* o un gran número de los procedimientos. 
+Para evitar esto, existen varias técnicas de imputación de datos que emplea, como la sustitución por la media o la moda, por el mínimo valor o eliminar el registro con el valor nulo. 
+
+
+## Tratamiento de valores nulos
+
+En primer lugar, se hace un primer diagnóstico acerca de los posibles valores a imputar
+```{r}
+diagnose(SaludMental)
+```
+
+
+Como se ha mencionado, existen varias columnas sin datos, por los que se borrarán algunas de ellas, así como otras columnas redundantes.
+
+```{r}
+SaludMental |>
+  select(
+    where(
+      ~ all(is.na(.)) # Condición: donde TODOS los valores (all) son NA en esa columna (.)
+    )
+  ) |>
+  names()
+```
+```{r}
+# nulas
+SaludMental$`CCAA Residencia` <- NULL
+SaludMental$`Valor Peso Español`<- NULL
+SaludMental$`Valor Peso Americano APR`<- NULL
+SaludMental$`Tipo PROCESO IR`<- NULL
+
+# redundantes
+SaludMental$`Mes de Ingreso`<- NULL
+SaludMental$`Edad en Ingreso`<- NULL
+SaludMental$Procedencia <- NULL
+
+```
+
+
+
+Por otro lado procederemos a imputar valores nulos en columnas relevantes
+```{r}
+SaludMental$Sexo[is.na(SaludMental$Sexo)]  <- "No especificado"
+```
+Otras columnas significativas son datos médicos o acerca de diagnósticos y procedimientos, por los que para esos no se realizarán imputaciones. 
+
+
+
+Por otro lado, eliminaremos los registros para los que no existe *CIP SNS Recodificado*, el cual es un código identificación personal. 
+
+```{r}
+SaludMental <- SaludMental[!is.na(SaludMental$`CIP SNS Recodificado`),]  
+```
+
+
+
 
 ## Detección y Análisis de Outliers
 
-Como se ha mencionado, existen variables con outliers potenciales. Para visualizarlos mejor, vamos a prepresentarlos con un diagrama de caja y bigotes.
+Como se ha mencionado, existen variables con outliers potenciales. Para visualizarlos mejor, vamos a prepresentarlos con un diagrama de caja y bigotes en el caso de las variables numéricas y un histograma en el caso de las categóricas.
 
 ```{r}
 
-# Usando la librería ggplot2 que ya estás cargando
 SaludMental |>
   ggplot(aes(y = `Estancia Días`, x = "")) +
   geom_boxplot(
@@ -313,9 +388,9 @@ SaludMental |>
   theme(axis.text.x = element_blank())
 ```
 
-Debido a que los outliers mencionados están muy alejados de la media no se aprecia bien el diagrama, por lo que se mostrará una sección de este.
+Debido a que los outliers mencionados están muy alejados de la media no se aprecia bien el diagrama de caja y bigotes, por lo que se mostrará una sección de este.
 
-```{r}
+```{r warning=FALSE}
 SaludMental |>
   ggplot(aes(y = `Estancia Días`, x = "")) +
   geom_boxplot(fill = "#A8C6E1", color = "#4C78A8") +
@@ -326,7 +401,8 @@ SaludMental |>
   
   labs(
     title = "Distribución de 'Estancia Días' (Zoom en Estancias Cortas)",
-    subtitle = "Valores superiores a 80 días cortados del gráfico para apreciar la densidad central",
+    subtitle = "Valores superiores a 80 días cortados
+      del gráfico para apreciar la densidad central",
     y = "Estancia Días (en días)",
     x = ""
   ) +
@@ -345,7 +421,7 @@ SaludMental |>
   geom_text(stat = "count", aes(label = after_stat(count)), vjust = -0.5, size = 3) +
   labs(
     title = "Frecuencia del Tipo de Alta",
-    subtitle = "El '9: Otros/Desconocido' es un outlier categórico por su baja frecuencia",
+    subtitle = "El 'Otros/Desconocido' es un outlier categórico por su baja frecuencia",
     x = "Tipo de Alta",
     y = "Frecuencia (Nº de Registros)"
   ) +
@@ -364,11 +440,15 @@ Empezaremos segmentando la variable *Edad* en 3 grupos: Menores de Edad, Adultos
 
 ```{r}
 SaludMental <-  SaludMental |> 
-  mutate(Edad_Rango = case_when( SaludMental$Edad < 18 ~ "Menor (0-17)", SaludMental$Edad >= 18 & SaludMental$Edad < 45 ~ "Adulto (18-44)", SaludMental$Edad >= 45 & SaludMental$Edad < 65 ~ "Adulto (45-64)", TRUE ~ "Mayor (65+)" ))
+  mutate(Edad_Rango = 
+           case_when( SaludMental$Edad < 18 ~ "Menor (0-17)", 
+                                 SaludMental$Edad >= 18 & SaludMental$Edad < 45 ~ "Adulto (18-44)", 
+                                 SaludMental$Edad >= 45 & SaludMental$Edad < 65 ~ "Adulto (45-64)", 
+                      TRUE ~ "Mayor (65+)" ))
 
 
 SaludMental |> 
-  select(Nombre, Edad, Edad_Rango)
+  select(Nombre, `CIP SNS Recodificado`, Edad, Edad_Rango)
 ```
 
 Por otro lado, también puede ser interesante añadir el día de la semana con el propósito de evaluar si los los ingresos varían según el día.
@@ -382,7 +462,7 @@ SaludMental <- SaludMental |>
 
 
 SaludMental |> 
-  select(Nombre, `Fecha de Ingreso`, Dia_Semana_Ingreso)
+  select(Nombre, `CIP SNS Recodificado`, `Fecha de Ingreso`, Dia_Semana_Ingreso)
 ```
 
 ## Variables Clínicas y de Calidad
@@ -406,8 +486,20 @@ SaludMental <- SaludMental |>
 
 
 SaludMental |> 
-  select(Nombre, Num_Diagnosticos, Num_Procedimientos)
+  select(Nombre, `CIP SNS Recodificado`, Num_Diagnosticos, Num_Procedimientos)
 ```
+
+
+Debido a que muchos de estos datos son información sensible y personal del paciente como puede ser el nombre o la fecha de nacimiento , hay que anonimizarlos para después tratarlos. 
+
+
+
+
+
+
+
+
+
 
 # Conclusión
 El análisis exploratorio realizado sobre el conjunto de datos de salud mental revela aspectos cruciales tanto en la calidad de los datos como en las características demográficas y asistenciales de los pacientes.
@@ -415,27 +507,20 @@ El análisis exploratorio realizado sobre el conjunto de datos de salud mental r
 
 ### Calidad y Estructura de los Datos
 
-**Problemas de Integridad**: Se identificó una cantidad elevada de valores nulos (NA) en numerosas variables, especialmente en aquellas procedimentales y de diagnóstico secundario, lo que representa un desafío de calidad de datos. Específicamente, variables clave como *Régimen Financiación* o *CCAA Residencia* muestran una tasa de completitud del 0%.
+**Integridad de datos**. Se identificó un porcentaje alto de valores nulos (NA) en numerosas variables, especialmente en aquellas procedimentales y de diagnóstico, lo que representa un desafío de calidad de datos. Adicionalmente, variables clave como *Reingreso* o *CCAA Residencia* muestran una gran falta de información, por lo que esas columnas se han eliminado, así como registros en los que faltaba el código identificativo. Por otro lado, se ha realizado alguna imputación de valores nulos.
 
 
-**Preparación de Variables**: Las principales variables categóricas (*Sexo*, *Tipo Alta*, *Circunstancia de Contacto* y otras) fueron correctamente transformadas y re-etiquetadas a factores, según el documento proporcionado.
+**Preparación de Variables**. Las principales variables categóricas (*Sexo*, *Tipo Alta*, *Circunstancia de Contacto*, etc) fueron etiquetadas de acuerdo al documento porporcionado y transformadas a factores para facilitar su posterior procesamiento. 
+
 
 ### Resultados Estadísticos Clave
 
-**Distribución de la Edad**: La variable *Edad* presenta una distribución cercana a la normal (o ligeramente sesgada), lo que se corrobora con la proximidad entre la media (43.64 años) y la mediana (44.00 años).
+**Distribuciones de los datos**. Se han encontrado tanto variables con datos que siguen una distribución gausiana, como puede ser *Edad*, como variables con asímetrias ligeras o significativas (*Estancia Días*) provocadas por un número de outliers que distorsionan valores clave como la media. 
 
 
 
-**Sesgo en la Estancia**: La variable *Estancia Días* muestra una asimetría positiva significativa, confirmando la presencia de valores atípicos (outliers) extremos. La disparidad entre la media y la mediana, debido a que unos pocos casos de estancias muy largas elevan el promedio, indican que la mediana es una medida más robusta de la duración típica de la estancia.
+### Ingeniería de Características  
+**Preparación para Modelado**. Se ha enriquecido el dataset mediante *Feature Engineering*, creando variables esenciales como el rango de edad o recuentos de diagnóstico, con el propósito de potenciar 
 
 
-### Características Asistenciales Dominantes
-
-**Vía de Contacto**: La mayoría de los contactos asistenciales se realizaron por la vía *Urgente* , en contraposición a los contactos *Programados*.
-
-
-**Especialidad y Riesgo**: El servicio con mayor frecuencia de ingresos es *Psiquiatría* (PSQ). La mayoría de los pacientes tienen un *Riesgo de Mortalidad APR* catalogado como Nivel 1, lo que sugiere que, en general, la población de estudio presenta un bajo riesgo de mortalidad.
-
-
-
-En resumen, el dataset está listo para la fase de modelado en cuanto a la distribución de la edad, pero requiere una estrategia rigurosa de imputación o limpieza de datos nulos y una consideración especial de los outliers en variables para garantizar la validez de cualquier análisis inferencial posterior.
+En resumen, el dataset está listo para la fase de modelado tras una estrategia rigurosa de imputación o limpieza de datos nulos y una consideración especial de los outliers para garantizar la validez de cualquier análisis inferencial.

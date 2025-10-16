@@ -1,0 +1,1 @@
+{"frames":[],"message":"Error en SaludMental[!is.na(SaludMental$`CIP SNS Recodificado`), ]: \n  function '[' not supported in RHS call of a pipe (<input>:2:3)\n"}

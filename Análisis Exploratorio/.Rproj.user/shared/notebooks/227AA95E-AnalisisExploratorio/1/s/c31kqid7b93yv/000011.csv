@@ -1,0 +1,28 @@
+"0","SaludMental |>
+  select(
+    where(is.numeric), # Selecciona todas las columnas de tipo numérico/entero
+    where(is.factor)   # Selecciona todas las columnas de tipo factor
+    #where(is.)
+  ) |>
+  skim()
+"
+"1","── Data Summary ────────────────────────
+"
+"1","                           Values                      
+"
+"1","Name                       select(SaludMental, where...
+"
+"1","Number of rows             21210                       
+"
+"1","Number of columns          13                          
+"
+"1","_______________________                                
+"
+"1","Column type frequency:                                 
+"
+"1","  numeric                  13                          
+"
+"1","________________________                               
+"
+"1","Group variables            None                        
+"

@@ -2,8 +2,6 @@
 title: "Análisis Exploratorio de SaludMental"
 author: "Castores Afanosos"
 output:
-  pdf_document:
-    latex_engine: xelatex  # ¡La clave está aquí!
   html_document:
     theme: cerulean
     highlight: tango
@@ -12,6 +10,8 @@ output:
     toc_float:
       collapsed: true
       smooth_scroll: true
+  pdf_document:
+    latex_engine: xelatex  # ¡La clave está aquí!
 ---
 
 ```{r setup, include=FALSE}

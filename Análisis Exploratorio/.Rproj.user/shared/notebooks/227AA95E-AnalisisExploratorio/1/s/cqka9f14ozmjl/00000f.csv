@@ -1,0 +1,30 @@
+"0","SaludMental |>
+  ggplot(aes(x = Edad)) + # ¡CORRECCIÓN CLAVE! Solo se usa 'Edad' aquí.
+  # 1. Histograma: Muestra la frecuencia de las clases
+  geom_histogram(
+    aes(y = after_stat(density)), # Normaliza el eje Y para la curva de densidad
+    binwidth = 5, # Agrupa las edades en intervalos de 5 años
+    fill = ""#4C78A8"",
+    color = ""white"",
+    alpha = 0.7
+  ) +
+  # 2. Curva de Densidad
+  geom_density(linewidth = 1.2, color = ""#F58518"") +
+  # 3. Marcas de Media y Mediana (usando los valores precalculados)
+  geom_vline(aes(xintercept = media_edad, color = ""Media""), # Se usa el valor precalculado
+             linetype = ""dashed"", linewidth = 1) +
+  geom_vline(aes(xintercept = mediana_edad, color = ""Mediana""), # Se usa el valor precalculado
+             linetype = ""solid"", linewidth = 1) +
+  # Etiquetas y tema
+  scale_color_manual(name = ""Estadístico"",
+                     values = c(""Media"" = ""#4C78A8"", ""Mediana"" = ""#E45756"")) +
+  labs(
+    title = ""Distribución de la Edad de los Contactos"",
+    subtitle = paste0(""Media: "", round(media_edad, 2), "" | Mediana: "", round(mediana_edad, 2)),
+    x = ""Edad (Años)"",
+    y = ""Densidad""
+  ) +
+  theme_minimal()
+"
+"2","Error: objeto 'media_edad' no encontrado
+"
